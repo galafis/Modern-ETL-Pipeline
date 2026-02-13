@@ -1,138 +1,116 @@
-# 🔄 Modern Etl Pipeline
+# Modern ETL Pipeline
 
-> Professional project by Gabriel Demetrios Lafis
-
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB.svg)](https://img.shields.io/badge/)
-[![NumPy](https://img.shields.io/badge/NumPy-1.26-013243.svg)](https://img.shields.io/badge/)
-[![Pandas](https://img.shields.io/badge/Pandas-2.2-150458.svg)](https://img.shields.io/badge/)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB.svg)](https://www.python.org/)
+[![pandas](https://img.shields.io/badge/pandas-1.3+-150458.svg)](https://pandas.pydata.org/)
+[![NumPy](https://img.shields.io/badge/NumPy-1.21+-013243.svg)](https://numpy.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[English](#english) | [Português](#português)
+[Portugues](#portugues) | [English](#english)
 
 ---
 
-## English
+## Portugues
 
-### 🎯 Overview
+### Visao Geral
 
-**Modern Etl Pipeline** is a production-grade Python application that showcases modern software engineering practices including clean architecture, comprehensive testing, containerized deployment, and CI/CD readiness.
+Pipeline ETL escrito em Python com um unico arquivo-fonte (`etl_pipeline.py`, ~387 linhas).
+Extrai dados de arquivos CSV e de uma API simulada, aplica limpeza e transformacao, e carrega os resultados em CSV e SQLite.
 
-The codebase comprises **386 lines** of source code organized across **1 modules**, following industry best practices for maintainability, scalability, and code quality.
+**Classes principais:**
 
-### ✨ Key Features
+| Classe | Responsabilidade |
+|--------|-----------------|
+| `DataExtractor` | Le arquivos CSV e gera dados mock de API |
+| `DataTransformer` | Remove duplicatas, preenche nulos, remove outliers (IQR), adiciona colunas calculadas (categorias de preco, timestamp) |
+| `DataLoader` | Grava resultados em CSV e SQLite |
+| `ETLPipeline` | Orquestra extract, transform, load e registra metricas em JSON |
 
-- **🔄 Data Pipeline**: Scalable ETL with parallel processing
-- **✅ Data Validation**: Schema validation and quality checks
-- **📊 Monitoring**: Pipeline health metrics and alerting
-- **🔧 Configurability**: YAML/JSON-based pipeline configuration
-- **🏗️ Object-Oriented**: 4 core classes with clean architecture
-
-### 🏗️ Architecture
+### Arquitetura
 
 ```mermaid
 graph LR
-    subgraph Input["📥 Data Sources"]
-        A[Stream Input]
-        B[Batch Input]
+    subgraph Fontes
+        CSV[Arquivo CSV]
+        API[API Simulada]
     end
-    
-    subgraph Processing["⚙️ Processing Engine"]
-        C[Ingestion Layer]
-        D[Transformation Pipeline]
-        E[Validation & QA]
+
+    subgraph Pipeline
+        EX[DataExtractor]
+        TR[DataTransformer]
+        LD[DataLoader]
     end
-    
-    subgraph Output["📤 Output"]
-        F[(Data Store)]
-        G[Analytics]
-        H[Monitoring]
+
+    subgraph Saidas
+        OCSV[CSV Processado]
+        DB[(SQLite)]
+        MET[Metricas JSON]
     end
-    
-    A --> C
-    B --> C
-    C --> D --> E
-    E --> F
-    E --> G
-    D --> H
-    
-    style Input fill:#e1f5fe
-    style Processing fill:#f3e5f5
-    style Output fill:#e8f5e9
+
+    CSV --> EX
+    API --> EX
+    EX --> TR
+    TR -->|limpeza + transformacao| LD
+    LD --> OCSV
+    LD --> DB
+    LD --> MET
 ```
 
-```mermaid
-classDiagram
-    class DataLoader
-    class DataTransformer
-    class ETLPipeline
-    class DataExtractor
-```
-
-### 🚀 Quick Start
-
-#### Prerequisites
-
-- Python 3.12+
-- pip (Python package manager)
-
-#### Installation
+### Inicio Rapido
 
 ```bash
-# Clone the repository
+# Clonar o repositorio
 git clone https://github.com/galafis/Modern-ETL-Pipeline.git
 cd Modern-ETL-Pipeline
 
-# Create and activate virtual environment
+# Criar e ativar ambiente virtual
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# Install dependencies
+# Instalar dependencias
 pip install -r requirements.txt
+
+# Executar o pipeline
+python etl_pipeline.py
+
+# Executar com agendamento (opcional, via biblioteca schedule)
+python etl_pipeline.py --schedule
 ```
 
-#### Running
-
-```bash
-# Run the application
-python src/main.py
-```
-
-### 📁 Project Structure
+### Estrutura do Projeto
 
 ```
 Modern-ETL-Pipeline/
-├── tests/         # Test suite
+├── etl_pipeline.py      # Codigo-fonte principal
+├── requirements.txt     # Dependencias (pandas, numpy, pyyaml, schedule, pytest)
+├── tests/
 │   ├── __init__.py
-│   └── test_main.py
+│   └── test_main.py     # Testes funcionais
 ├── LICENSE
-├── README.md
-├── etl_pipeline.py
-└── requirements.txt
+└── README.md
 ```
 
-### 🛠️ Tech Stack
+### Testes
 
-| Technology | Description | Role |
-|------------|-------------|------|
-| **Python** | Core Language | Primary |
-| **NumPy** | Numerical computing | Framework |
-| **Pandas** | Data manipulation library | Framework |
+```bash
+pytest tests/ -v
+```
 
-### 🤝 Contributing
+### Tecnologias
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+| Tecnologia | Uso |
+|------------|-----|
+| Python | Linguagem principal |
+| pandas | Manipulacao de dados |
+| NumPy | Operacoes numericas |
+| PyYAML | Leitura de configuracao YAML (opcional) |
+| schedule | Agendamento de execucao (opcional) |
+| pytest | Testes |
 
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Licenca
 
-### 📄 License
+Licenciado sob a Licenca MIT - veja o arquivo [LICENSE](LICENSE).
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-### 👤 Author
+### Autor
 
 **Gabriel Demetrios Lafis**
 - GitHub: [@galafis](https://github.com/galafis)
@@ -140,63 +118,53 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## Português
+## English
 
-### 🎯 Visão Geral
+### Overview
 
-**Modern Etl Pipeline** é uma aplicação Python de nível profissional que demonstra práticas modernas de engenharia de software, incluindo arquitetura limpa, testes abrangentes, implantação containerizada e prontidão para CI/CD.
+ETL pipeline written in Python with a single source file (`etl_pipeline.py`, ~387 lines).
+Extracts data from CSV files and a mock API, applies cleaning and transformation, and loads the results into CSV and SQLite.
 
-A base de código compreende **386 linhas** de código-fonte organizadas em **1 módulos**, seguindo as melhores práticas do setor para manutenibilidade, escalabilidade e qualidade de código.
+**Core classes:**
 
-### ✨ Funcionalidades Principais
+| Class | Responsibility |
+|-------|---------------|
+| `DataExtractor` | Reads CSV files and generates mock API data |
+| `DataTransformer` | Removes duplicates, fills nulls, removes outliers (IQR), adds calculated columns (price categories, timestamp) |
+| `DataLoader` | Writes results to CSV and SQLite |
+| `ETLPipeline` | Orchestrates extract, transform, load and logs metrics to JSON |
 
-- **🔄 Data Pipeline**: Scalable ETL with parallel processing
-- **✅ Data Validation**: Schema validation and quality checks
-- **📊 Monitoring**: Pipeline health metrics and alerting
-- **🔧 Configurability**: YAML/JSON-based pipeline configuration
-- **🏗️ Object-Oriented**: 4 core classes with clean architecture
-
-### 🏗️ Arquitetura
+### Architecture
 
 ```mermaid
 graph LR
-    subgraph Input["📥 Data Sources"]
-        A[Stream Input]
-        B[Batch Input]
+    subgraph Sources
+        CSV[CSV File]
+        API[Mock API]
     end
-    
-    subgraph Processing["⚙️ Processing Engine"]
-        C[Ingestion Layer]
-        D[Transformation Pipeline]
-        E[Validation & QA]
+
+    subgraph Pipeline
+        EX[DataExtractor]
+        TR[DataTransformer]
+        LD[DataLoader]
     end
-    
-    subgraph Output["📤 Output"]
-        F[(Data Store)]
-        G[Analytics]
-        H[Monitoring]
+
+    subgraph Outputs
+        OCSV[Processed CSV]
+        DB[(SQLite)]
+        MET[Metrics JSON]
     end
-    
-    A --> C
-    B --> C
-    C --> D --> E
-    E --> F
-    E --> G
-    D --> H
-    
-    style Input fill:#e1f5fe
-    style Processing fill:#f3e5f5
-    style Output fill:#e8f5e9
+
+    CSV --> EX
+    API --> EX
+    EX --> TR
+    TR -->|clean + transform| LD
+    LD --> OCSV
+    LD --> DB
+    LD --> MET
 ```
 
-### 🚀 Início Rápido
-
-#### Prerequisites
-
-- Python 3.12+
-- pip (Python package manager)
-
-#### Installation
+### Quick Start
 
 ```bash
 # Clone the repository
@@ -205,49 +173,53 @@ cd Modern-ETL-Pipeline
 
 # Create and activate virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+
+# Run the pipeline
+python etl_pipeline.py
+
+# Run with scheduling (optional, via schedule library)
+python etl_pipeline.py --schedule
 ```
 
-#### Running
-
-```bash
-# Run the application
-python src/main.py
-```
-
-### 📁 Estrutura do Projeto
+### Project Structure
 
 ```
 Modern-ETL-Pipeline/
-├── tests/         # Test suite
+├── etl_pipeline.py      # Main source code
+├── requirements.txt     # Dependencies (pandas, numpy, pyyaml, schedule, pytest)
+├── tests/
 │   ├── __init__.py
-│   └── test_main.py
+│   └── test_main.py     # Functional tests
 ├── LICENSE
-├── README.md
-├── etl_pipeline.py
-└── requirements.txt
+└── README.md
 ```
 
-### 🛠️ Stack Tecnológica
+### Tests
 
-| Tecnologia | Descrição | Papel |
-|------------|-----------|-------|
-| **Python** | Core Language | Primary |
-| **NumPy** | Numerical computing | Framework |
-| **Pandas** | Data manipulation library | Framework |
+```bash
+pytest tests/ -v
+```
 
-### 🤝 Contribuindo
+### Technologies
 
-Contribuições são bem-vindas! Sinta-se à vontade para enviar um Pull Request.
+| Technology | Usage |
+|------------|-------|
+| Python | Core language |
+| pandas | Data manipulation |
+| NumPy | Numerical operations |
+| PyYAML | YAML config reading (optional) |
+| schedule | Execution scheduling (optional) |
+| pytest | Testing |
 
-### 📄 Licença
+### License
 
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+Licensed under the MIT License - see [LICENSE](LICENSE).
 
-### 👤 Autor
+### Author
 
 **Gabriel Demetrios Lafis**
 - GitHub: [@galafis](https://github.com/galafis)

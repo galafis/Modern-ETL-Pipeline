@@ -9,7 +9,7 @@ import numpy as np
 import sqlite3
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 import schedule
 import time
@@ -186,11 +186,11 @@ class ETLPipeline:
     """Main ETL Pipeline orchestrator."""
     
     def __init__(self, config_path: str = 'config.yaml'):
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.config = self.load_config(config_path)
         self.extractor = DataExtractor(self.config)
         self.transformer = DataTransformer(self.config)
         self.loader = DataLoader(self.config)
-        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         
         # Create output directories
         Path('data/raw').mkdir(parents=True, exist_ok=True)
@@ -250,9 +250,9 @@ class ETLPipeline:
     
     def run_pipeline(self):
         """Execute the complete ETL pipeline."""
+        start_time = datetime.now()
         try:
             self.logger.info("Starting ETL Pipeline execution")
-            start_time = datetime.now()
             
             # Extract data from multiple sources
             extracted_data = []
@@ -337,7 +337,7 @@ class ETLPipeline:
             try:
                 with open(metrics_file, 'r') as f:
                     existing_metrics = json.load(f)
-            except:
+            except (json.JSONDecodeError, IOError, OSError):
                 existing_metrics = []
         
         # Add new metrics
